@@ -31,21 +31,25 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'rest_framework',  # django REST framework (external)
-    'corsheaders',  # app for cors functionality (external)
-    'authenticate',  # auth app (custom)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # external dependencies
+    'rest_framework',  # django REST framework
+    'corsheaders',  # app for cors functionality
+    
+    # custom apps
+    'authenticate',  # auth app 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # cors middleware (external)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # cors middleware (external)
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,6 +107,8 @@ DATABASES = {
     }
 }
 
+
+AUTH_USER_MODEL = 'authenticate.CustomUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
