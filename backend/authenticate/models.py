@@ -9,4 +9,5 @@ class CustomUser(AbstractUser):
 
     class Meta:
         managed = False
+        ordering = ['user_id']
         unique_together = [['user_id', 'email', 'username']]
