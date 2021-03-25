@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',  # app for cors functionality
     
     # custom apps
-    'authenticate',  # auth app 
+    'authenticate',  # auth app
+    'horcrux',  # horcrux app 
 ]
 
 MIDDLEWARE = [
