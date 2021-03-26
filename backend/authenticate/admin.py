@@ -5,7 +5,7 @@ from django.contrib.admin import ModelAdmin
 from .models import CustomUser
 
 # Register your models here.
-class CustomUserAdmin(ModelAdmin):
+class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ['user_id', 'email', 'username', 'public_key', 'auth_per_upload']
     list_editable = ['auth_per_upload']
