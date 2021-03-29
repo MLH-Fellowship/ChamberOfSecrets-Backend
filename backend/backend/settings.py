@@ -71,6 +71,11 @@ REST_FRAMEWORK = {
     ),
 }
 
+# jwt settings
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'backend.utils.my_jwt_response_handler'
+}
+
 # cors settings
 
 CORS_ORIGIN_ALLOW_ALL = True

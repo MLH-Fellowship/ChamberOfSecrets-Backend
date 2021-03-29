@@ -4,26 +4,28 @@ from django.contrib.auth.models import User
 from .models import UserInfo
 
 
+# serializer for User model
 class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
         fields = ('username',)
 
-
+# serializer for User model
 class UserSerializerWithToken(serializers.ModelSerializer):
 
     token = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True)
 
+    # generates JWT token
     def get_token(self, obj):
         jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
         jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
         payload = jwt_payload_handler(obj)
         token = jwt_encode_handler(payload)
-        print(token)
         return token
 
+    # creates model instance 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         instance = self.Meta.model(**validated_data)
@@ -36,9 +38,8 @@ class UserSerializerWithToken(serializers.ModelSerializer):
         model = User
         fields = ('token', 'username', 'password')
 
-
+# serializer for UserInfo model
 class UserInfoSerializer(serializers.Serializer):
-    username = serializers.CharField()
     public_key = serializers.CharField()
     auth_per_upload = serializers.BooleanField()
 
@@ -50,4 +51,4 @@ class UserInfoSerializer(serializers.Serializer):
 
     class Meta:
         model = UserInfo
-        fields = ('username', 'public_key', 'auth_per_upload')
+        fields = ('public_key', 'auth_per_upload')
