@@ -30,7 +30,7 @@ class UserList(APIView):
         "username":"",
         "password":"",
         "public_key":"",
-        "auth_per_upload":""
+        "auth_per_upload":"True/False"
     }
 
     """
@@ -43,9 +43,9 @@ class UserList(APIView):
         
         if serializer_user.is_valid():
             serializer_user.save()  # saves the user model
-            return Response(serializer_user.data, status=status.HTTP_201_CREATED)  # TODO: remove this line and uncomment the bottom part later
-            # if serializer_userinfo.is_valid():
-            #     user = User.objects.get(username=request.data['username'])
-            #     serializer_userinfo.save(username=user)  # save userinfo model
-            #     return Response(serializer_user.data, status=status.HTTP_201_CREATED)  # returns response with JWT token
+            #Response(serializer_user.data, status=status.HTTP_201_CREATED)  # TODO: remove this line and uncomment the bottom part later
+            if serializer_userinfo.is_valid():
+                user = User.objects.get(username=request.data['username'])
+                serializer_userinfo.save(username=user)  # save userinfo model
+                return Response(serializer_user.data, status=status.HTTP_201_CREATED)  # returns response with JWT token
         return Response(serializer_user.errors, status=status.HTTP_400_BAD_REQUEST)  # returns response error code
