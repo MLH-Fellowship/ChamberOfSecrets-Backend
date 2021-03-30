@@ -8,6 +8,7 @@ django = "==2.2.19"
 djangorestframework = "*"
 djangorestframework-jwt = "*"
 django-cors-headers = "*"
+cryptography = "*"
 
 [dev-packages]
 
