@@ -9,14 +9,11 @@ djangorestframework = "*"
 djangorestframework-jwt = "*"
 django-cors-headers = "*"
 cryptography = "*"
-<<<<<<< HEAD
-=======
 filesplit = "*"
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 pyjwt = "==1.7.1"
->>>>>>> 5cb6cc5b6c9f0da6778c6833338749d41bcf36e3
 
 [dev-packages]
 
