@@ -71,10 +71,17 @@ REST_FRAMEWORK = {
     ),
 }
 
+# jwt settings
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'backend.utils.my_jwt_response_handler'
+}
+
 # cors settings
-CORS_ORIGIN_WHITELIST = (
-    'https://localhost:3000',
-)
+
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = (
+#     'https://localhost:3000',
+# )
 
 
 ROOT_URLCONF = 'backend.urls'
@@ -109,7 +116,6 @@ DATABASES = {
 }
 
 
-AUTH_USER_MODEL = 'authenticate.CustomUser'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -148,3 +154,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
