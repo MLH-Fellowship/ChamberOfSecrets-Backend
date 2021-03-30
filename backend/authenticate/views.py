@@ -35,7 +35,6 @@ class UserList(APIView):
     {
         "username":"",
         "password":"",
-        "public_key":"",
         "auth_per_upload":"True/False"
     }
 
