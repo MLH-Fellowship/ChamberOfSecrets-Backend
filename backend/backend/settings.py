@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # external dependencies
     'rest_framework',  # django REST framework
     'corsheaders',  # app for cors functionality
+    'rest_framework_simplejwt',
     
     # custom apps
     'authenticate',  # auth app
@@ -65,6 +66,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
