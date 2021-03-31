@@ -130,3 +130,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#ignoring all storage files uploaded
+backend/media/files
+backend/media/splits
