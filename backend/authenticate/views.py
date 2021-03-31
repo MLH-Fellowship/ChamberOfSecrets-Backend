@@ -60,7 +60,7 @@ class UserList(APIView):
                 serializer_user_data = serializer_user.data  # creating a copy of serializer.data
 
                 # generating private key jwt
-                private_key_payload = {'private': 'ThisIsAPrivateKey'}  # replace private key value with the generated one
+                private_key_payload = {'private': str(private_key,'utf-8')}  # replace private key value with the generated one
                 private = jwt.encode(private_key_payload, settings.SECRET_KEY, algorithm='HS256').decode('utf-8')
                 serializer_user_data['private'] = private
 
