@@ -9,6 +9,8 @@ from .encryption_decryption.combined import encrypt
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import FileUploadSerializer
 from .models import FileUpload 
+from django.conf import settings
+import jwt
 
 # Create your views here.
 class FileUploadViewSet(APIView):
@@ -22,26 +24,13 @@ class FileUploadViewSet(APIView):
     def post(self, request):
         print("wassup")
         serializer = FileUploadSerializer(data=request.data)
-        # print("serializer",request.data)
-        # for file_entry in request.FILES.getlist('files'):
-        #     uploaded_file_name = file_entry.name
-        #     uploaded_file_content = file_entry.read()
-        #     print("uploaded file name")
         if serializer.is_valid():
             serializer.save()
             file_path = os.getcwd() + serializer.data['file_uploaded'].replace('/', '\\')
-            # print(os.getcwd()+'\media\splits')
-            # print(request)
-            #request.headers['authorization']
-            # import jwt
-            # encoded = jwt.encode({"some": "payload"}, settings.SECRET_KEY, algorithm="HS256")
-            print("inside serializer.usvalies")
-            #pyjwt
-            # import jwt
-            # jwt.decode(token,settings.SECRET)
-            #i need the bearer token
-            # #decode this toke and get username
-            encrypt(file_path, os.getcwd()+'\media\splits',"0pGPL19ZcYqtY8HWLjbAM8IkBGCHZYz-GTgTxR_9lik=","new")
+            jwt_token=request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
+            jwt_token=jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+            print("headers",request.data['private_key'])
+            encrypt(file_path, os.getcwd()+'\media\splits',request.data['private_key'],jwt_token['username'])
             """
             Encryption and splitting logic goes here
 
