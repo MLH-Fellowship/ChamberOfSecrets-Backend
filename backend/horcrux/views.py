@@ -22,14 +22,12 @@ class FileUploadViewSet(APIView):
 
 
     def post(self, request):
-        print("wassup")
         serializer = FileUploadSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             file_path = os.getcwd() + serializer.data['file_uploaded'].replace('/', '\\')
             jwt_token=request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
             jwt_token=jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-            print("headers",request.data['private_key'])
             encrypt(file_path, os.getcwd()+'\media\splits',request.data['private_key'],jwt_token['username'])
             """
             Encryption and splitting logic goes here
