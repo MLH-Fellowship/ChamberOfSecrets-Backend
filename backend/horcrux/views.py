@@ -71,7 +71,6 @@ class UserFileView(APIView):
         jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
         user_files = FileData.objects.filter(username=jwt_token['username'])
         serializer = UserFileSerializer(user_files, many=True)
-        print(serializer.data)
         return Response(serializer.data)
 
 
