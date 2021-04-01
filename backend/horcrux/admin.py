@@ -7,7 +7,7 @@ from .models import FileData, FileUpload
 
 class FileDataAdmin(ModelAdmin):
     model = FileData
-    list_display = ['username', 'file_id', 'file_name', 'split_1', 'split_2', 'split_3']  
+    list_display = ['username', 'file_id', 'file_name', 'upload_date', 'upload_file_name', 'split_1', 'split_2', 'split_3']  
 
 class FileUploadAdmin(ModelAdmin):
     model = FileUpload

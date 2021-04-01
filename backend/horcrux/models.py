@@ -11,6 +11,8 @@ class FileData(models.Model):
     username = models.ForeignKey(User, to_field="username", on_delete=models.CASCADE)
     file_id = models.AutoField(primary_key=True)
     file_name = models.CharField(max_length=1024)
+    upload_date = models.DateTimeField(auto_now=True)
+    upload_file_name = models.CharField(max_length=1030)
     split_1 = models.TextField()
     split_2 = models.TextField()
     split_3 = models.TextField()
