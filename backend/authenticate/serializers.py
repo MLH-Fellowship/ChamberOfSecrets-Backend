@@ -42,6 +42,7 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 class UserInfoSerializer(serializers.Serializer):
     public_key = serializers.CharField()
     auth_per_upload = serializers.BooleanField()
+    gdrive_token = serializers.CharField()
 
     def create(self, validated_data):
         """
@@ -51,4 +52,4 @@ class UserInfoSerializer(serializers.Serializer):
 
     class Meta:
         model = UserInfo
-        fields = ('public_key', 'auth_per_upload')
+        fields = ('public_key', 'auth_per_upload', 'gdrive_token')
