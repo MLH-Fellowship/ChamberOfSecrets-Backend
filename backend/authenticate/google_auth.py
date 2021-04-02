@@ -1,11 +1,12 @@
 from __future__ import print_function
 import os.path
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
 from .models import UserInfo
+from .ENV import client_config
 
 # visit https://developers.google.com/drive/api/v3/about-auth for more scopes
 SCOPES = ['4/1AY0e-g7Vf0HJlqhiUlA1nL9K6oDTScvKIeFW8ScIvJsf5PhJX2MgfhyPdts']
@@ -29,8 +30,7 @@ def google_oauth_flow():
         flow: Google OAuth flow
         redirect_url: The URL where the user has to go to in order to verify themselves
     """
-    flow = Flow.from_client_secrets_file(
-        'credentials.json', SCOPES)
+    flow = Flow.from_client_config(client_config, SCOPES)  
 
     auth_url, _ = flow.authorization_url(prompt='consent')
     return flow, auth_url

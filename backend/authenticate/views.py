@@ -72,8 +72,10 @@ class UserList(APIView):
         return Response(serializer_user.errors, status=status.HTTP_400_BAD_REQUEST)  # returns response error code
 
 
-@api_view(['GET'])
-def get_gauth_url(request):
-    GOOGLE_AUTH_FLOW, auth_url = google_oauth_flow()
-    return Response(auth_url)
+# API endpoint to fetch the google auth url
+class GetGauthUrl(APIView):
+    
+    def get(self, request):
+        GOOGLE_AUTH_FLOW, auth_url = google_oauth_flow()
+        return Response(auth_url)
     
