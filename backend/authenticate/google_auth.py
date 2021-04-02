@@ -5,7 +5,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
-from .modelsmodels import UserInfo
+from .models import UserInfo
 
 # visit https://developers.google.com/drive/api/v3/about-auth for more scopes
 SCOPES = ['4/1AY0e-g7Vf0HJlqhiUlA1nL9K6oDTScvKIeFW8ScIvJsf5PhJX2MgfhyPdts']
@@ -19,7 +19,7 @@ def check_auth_token(user):
         Bool: True, if the token exists, False otherwise.
     """
     user = UserInfo.objects.get(username=user)
-    if user.gdrive_token is not None:
+    if user.gdrive_token == "":
         return False
 
 
@@ -34,6 +34,7 @@ def google_oauth_flow():
 
     auth_url, _ = flow.authorization_url(prompt='consent')
     return flow, auth_url
+
 
 def get_auth_token(flow, code):
     """Veryfies the authorization code and generates access token for the user

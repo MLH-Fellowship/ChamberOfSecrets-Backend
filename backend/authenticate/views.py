@@ -12,7 +12,11 @@ from rest_framework_jwt.settings import api_settings
 
 from .serializers import UserSerializer, UserSerializerWithToken, UserInfoSerializer
 from .keys import generate_private_key, generate_encrypted_public_key
+from .google_auth import SCOPES, check_auth_token, google_oauth_flow, get_auth_token
 
+
+# global vars
+GOOGLE_AUTH_FLOW = None
 
 # Create your views here.
 
@@ -66,3 +70,10 @@ class UserList(APIView):
                 print(private_key_payload)  # TODO: Remove before deployment
                 return Response(serializer_user_data, status=status.HTTP_201_CREATED)  # returns response with JWT token
         return Response(serializer_user.errors, status=status.HTTP_400_BAD_REQUEST)  # returns response error code
+
+
+@api_view(['GET'])
+def get_gauth_url(request):
+    GOOGLE_AUTH_FLOW, auth_url = google_oauth_flow()
+    return Response(auth_url)
+    
