@@ -9,7 +9,7 @@ from .models import UserInfo
 from .ENV import client_config
 
 # visit https://developers.google.com/drive/api/v3/about-auth for more scopes
-SCOPES = ['4/1AY0e-g7Vf0HJlqhiUlA1nL9K6oDTScvKIeFW8ScIvJsf5PhJX2MgfhyPdts']
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 
 def check_auth_token(user):
@@ -30,13 +30,12 @@ def google_oauth_flow():
         flow: Google OAuth flow
         redirect_url: The URL where the user has to go to in order to verify themselves
     """
-    flow = Flow.from_client_config(client_config, SCOPES)  
-
+    flow = Flow.from_client_config(client_config, SCOPES, redirect_uri='urn:ietf:wg:oauth:2.0:oob')  
     auth_url, _ = flow.authorization_url(prompt='consent')
-    return flow, auth_url
+    return auth_url
 
 
-def get_auth_token(flow, code):
+def get_auth_token(code):
     """Veryfies the authorization code and generates access token for the user
     Args:
         flow: google_auth_oauthlib.flow.Flow object
@@ -44,9 +43,10 @@ def get_auth_token(flow, code):
     Returns:
         access_token: Access token for the user
     """
+    flow = Flow.from_client_config(client_config, SCOPES, redirect_uri='urn:ietf:wg:oauth:2.0:oob')
     flow.fetch_token(code=code)
     access_token = flow.credentials
-    return access_token.to_json()
+    return access_token.to_json() 
 
 
 

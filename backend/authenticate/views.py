@@ -13,10 +13,8 @@ from rest_framework_jwt.settings import api_settings
 from .serializers import UserSerializer, UserSerializerWithToken, UserInfoSerializer
 from .keys import generate_private_key, generate_encrypted_public_key
 from .google_auth import SCOPES, check_auth_token, google_oauth_flow, get_auth_token
+from .models import UserInfo
 
-
-# global vars
-GOOGLE_AUTH_FLOW = None
 
 # Create your views here.
 
@@ -74,8 +72,23 @@ class UserList(APIView):
 
 # API endpoint to fetch the google auth url
 class GetGauthUrl(APIView):
-    
+
     def get(self, request):
-        GOOGLE_AUTH_FLOW, auth_url = google_oauth_flow()
+        auth_url = google_oauth_flow()
         return Response(auth_url)
     
+
+class SetGauthToken(APIView):
+
+    def post(self, request):
+        # generating the access token
+        access_token = get_auth_token(code=request.data['code'])
+        
+        # saving the access token to the DB
+        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
+        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        user_info = UserInfo.objects.get(username=jwt_token['username'])
+        user_info.gdrive_token = access_token
+        user_info.save()
+
+        return Response("Drive Authentication Successful", status=status.HTTP_201_CREATED)  
