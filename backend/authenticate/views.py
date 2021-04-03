@@ -19,7 +19,7 @@ from .models import UserInfo
 # Create your views here.
 
 
-class CurrentUser(APIView):
+class CurrentUserView(APIView):
     """
     Checks for and determines the current user by their token, and return their data
     """
@@ -28,7 +28,7 @@ class CurrentUser(APIView):
         return Response(serializer.data) 
 
 
-class UserList(APIView):
+class UserListView(APIView):
     """
     Create a new user via sign-up.
     
@@ -71,14 +71,14 @@ class UserList(APIView):
 
 
 # API endpoint to fetch the google auth url
-class GetGauthUrl(APIView):
+class GetGauthUrlView(APIView):
 
     def get(self, request):
         auth_url = google_oauth_flow()
         return Response(auth_url)
     
 
-class SetGauthToken(APIView):
+class SetGauthTokenView(APIView):
 
     def post(self, request):
         # generating the access token

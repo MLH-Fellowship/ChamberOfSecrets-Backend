@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os.path
+import json 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow 
 from google.auth.transport.requests import Request
@@ -17,12 +18,13 @@ def check_auth_token(user):
     Args:
         user: Username of the user
     Returns:
-        Bool: True, if the token exists, False otherwise.
+        Bool: True, if the token exists, False otherwise. 
     """
     user_info = UserInfo.objects.get(username=user)
     if user_info.gdrive_token == None:
         return False
-
+    return True
+ 
 
 def google_oauth_flow():
     """Sets up flow for user auth via Google OAuth
