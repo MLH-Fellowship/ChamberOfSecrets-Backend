@@ -18,14 +18,14 @@ from .models import UserInfo
 
 # Create your views here.
 
-@api_view(['GET'])
-def current_user(request):
+
+class CurrentUser(APIView):
     """
     Checks for and determines the current user by their token, and return their data
     """
-    
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data) 
 
 
 class UserList(APIView):

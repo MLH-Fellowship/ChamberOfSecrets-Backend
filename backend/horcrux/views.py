@@ -2,6 +2,7 @@ import os
 import json
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from authenticate.google_auth import SCOPES, check_auth_token, google_oauth_flow, get_auth_token, generate_token_from_db
 
 from rest_framework.viewsets import ViewSet
 from rest_framework import status 
@@ -38,6 +39,8 @@ class FileUploadViewSet(APIView):
             jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
             encrypt(file_path, os.getcwd()+'\media\splits', request.data['private_key'], jwt_token['username'])
 
+
+
             # creating a log in FileData db table
             user = User.objects.get(username=jwt_token['username'])
             file_name = request.data['file_uploaded'].name
@@ -58,29 +61,32 @@ class FileUploadViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class DownloadFile(APIView):
+    """Downloads the horcurxes from user's file storages then combines+decrypts 
+    the horcruxes back into the original file which is sent back to the user.
+    """
                 
-@api_view(['POST'])
-def download_file(request):
-    file=request.data['file_name']
-    private_key=request.data['private_key']
-    jwt_token=request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
-    jwt_token=jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-    '''
-    1. Query the file data model for username=username and filename=filename
-    2. Get horcruxes from different places and place them in media/splits folder
-    '''
-    if(file):
-        filepath=r'\media\files'+"\\"
-        filepath=os.getcwd()+filepath+file
-        print("filepath",filepath)
-        decrypt(filepath, os.getcwd()+'\media\splits',private_key, jwt_token['username'])
-        with open(filepath, "rb") as file:
-            print("hello")
-            response = HttpResponse(file)
-            filename = "1-1-intro.pdf"
-            response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-            print(type(response))
-            return response
+    def post(self, request): 
+        file=request.data['file_name']
+        private_key=request.data['private_key']
+        jwt_token=request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
+        jwt_token=jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        '''
+        1. Query the file data model for username=username and filename=filename
+        2. Get horcruxes from different places and place them in media/splits folder
+        '''
+        if(file):
+            filepath=r'\media\files'+"\\"
+            filepath=os.getcwd()+filepath+file
+            print("filepath",filepath)
+            decrypt(filepath, os.getcwd()+'\media\splits',private_key, jwt_token['username'])
+            with open(filepath, "rb") as file:
+                print("hello")
+                response = HttpResponse(file)
+                filename = "1-1-intro.pdf"
+                response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+                print(type(response))
+                return response
 
 
 # GET api that fetches the list of files owned by the user   
