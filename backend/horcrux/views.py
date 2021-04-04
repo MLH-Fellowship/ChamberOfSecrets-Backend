@@ -18,7 +18,7 @@ from .models import FileUpload, FileData
 from .encryption_decryption.combined import encrypt, decrypt
 from .serializers import FileUploadSerializer, FileDataSerializer, UserFileSerializer
 
-from authenticate.google_auth import SCOPES, check_auth_token, google_oauth_flow, get_auth_token, generate_token_from_db
+from authenticate.google_auth import check_google_auth_token, generate_google_token_from_db 
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -51,8 +51,8 @@ class FileUploadView(APIView):
                 os.remove(file_path)
 
             # uploading on google drive
-            if check_auth_token(user=username):
-                creds = generate_token_from_db(user=username)
+            if check_google_auth_token(user=username):
+                creds = generate_google_token_from_db(user=username)
                 # getting file dir
                 file_dir = os.getcwd() + '\media\splits'   
                 files = os.listdir(file_dir)
