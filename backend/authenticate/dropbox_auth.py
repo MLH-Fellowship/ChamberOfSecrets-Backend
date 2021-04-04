@@ -3,6 +3,19 @@ from .ENV import dropbox_app_key, dropbox_app_secret
 
 SCOPES = ['files.content.read', 'files.content.write']
 
+def check_dropbox_auth_token(user):
+    """Checks if the user oauth token is already stored in the database.
+    Args:
+        user: Username of the user
+    Returns:
+        Bool: True, if the token exists, False otherwise. 
+    """
+    user_info = UserInfo.objects.get(username=user)
+    if user_info.dropbox_token == None:
+        return False
+    return True
+
+
 def dropbox_oauth_flow():
     """Sets up flow for user auth via Dropbox OAuth
     Returns:
@@ -24,3 +37,13 @@ def get_dropbox_auth_token(code):
     access_token = auth_result.access_token
     return access_token
      
+def generate_dropbox_token_from_db(user):
+    """Fetches the token string from the db and regenerates access token
+    Args:
+        user: Username of the user
+    Returns:
+        token: Access token for the user's Dropbox
+    """
+    user_info = UserInfo.objects.get(username=user)
+    token = user_info.dropbox_token  
+    return token
