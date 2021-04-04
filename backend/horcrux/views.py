@@ -1,11 +1,13 @@
 import os
 import jwt
 import json
+from datetime import datetime
 
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.viewsets import ViewSet
 from rest_framework import status 
@@ -19,7 +21,7 @@ from .encryption_decryption.combined import encrypt, decrypt
 from .serializers import FileUploadSerializer, FileDataSerializer, UserFileSerializer
 
 from authenticate.google_auth import check_google_auth_token, generate_google_token_from_db
-from authenticate.dropbox_auth import *
+from authenticate.dropbox_auth import check_dropbox_auth_token, generate_dropbox_token_from_db
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -39,13 +41,24 @@ class FileUploadView(APIView):
         serializer = FileUploadSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            
-            # file encryption and splitting
+
             file_path = os.getcwd() + serializer.data['file_uploaded'].replace('/', '\\')  # getting file path
             jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
             jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
             username = jwt_token['username']
-            encrypt(file_path, os.getcwd()+'\media\splits', request.data['private_key'], username)
+
+            # check if an entry with the same name already exists
+            user = User.objects.get(username=username) 
+            file_name = request.data['file_uploaded'].name
+            try:
+                file_exists = FileData.objects.get(username=user, file_name=file_name)
+                unique_id = str((datetime.now() - file_exists.upload_date.replace(tzinfo=None)).seconds) + "_" 
+                file_name = unique_id + file_name
+            except ObjectDoesNotExist:
+                pass
+            
+            # file encryption and splitting
+            encrypt(file_path, os.getcwd()+'\media\splits', request.data['private_key'], username, file_name)
             # delete file from DB and file storage
             FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()
             if os.path.exists(file_path):
@@ -65,6 +78,7 @@ class FileUploadView(APIView):
                 # uploading on google drive
                 for file in files:
                     file_path = os.path.join(file_dir, file)
+                    print(file_path)
                     media = MediaFileUpload(file_path, mimetype='*/*')
                     uploaded_file = service.files().create(media_body=media, fields='id').execute()
                     fid_list.append(uploaded_file.get('id'))
@@ -77,16 +91,12 @@ class FileUploadView(APIView):
                 return Response(status=status.HTTP_409_CONFLICT)
 
             # creating a log in FileData db table
-            user = User.objects.get(username=jwt_token['username'])
-            file_name = request.data['file_uploaded'].name
-            upload_file_name = serializer.data['file_uploaded'][13:]
             split_1, split_2, split_3 = fid_list
-            file_data = {'file_name':file_name, 'upload_file_name': upload_file_name, 
-                          'split_1':split_1, 'split_2':split_2,'split_3':split_3}
+            file_data = {'file_name':file_name, 'split_1':split_1, 'split_2':split_2,'split_3':split_3}
             serializer_filedata = FileDataSerializer(data=file_data)
             if serializer_filedata.is_valid():
                 serializer_filedata.save(username=user)  # creates FileData instance
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"file_uploaded": file_name}, status=status.HTTP_201_CREATED) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
