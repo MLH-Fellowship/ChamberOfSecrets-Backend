@@ -7,3 +7,4 @@ class UserInfo(models.Model):
     public_key = models.TextField()
     auth_per_upload = models.BooleanField(default=False)
     gdrive_token = models.TextField(blank=True) 
+    dropbox_token = models.TextField(blank=True)

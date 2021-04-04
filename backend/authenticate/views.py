@@ -13,6 +13,7 @@ from rest_framework_jwt.settings import api_settings
 from .serializers import UserSerializer, UserSerializerWithToken, UserInfoSerializer
 from .keys import generate_private_key, generate_encrypted_public_key
 from .google_auth import SCOPES, check_auth_token, google_oauth_flow, get_auth_token
+from .dropbox_auth import dropbox_oauth_flow, get_dropbox_auth_token
 from .models import UserInfo
 
 
@@ -76,7 +77,12 @@ class GetGauthUrlView(APIView):
     def get(self, request):
         auth_url = google_oauth_flow()
         return Response(auth_url)
-    
+
+# API endpoint to fetch the dropbox auth url
+class GetDropboxauthUrlView(APIView):
+    def get(self, request):
+        auth_url = dropbox_oauth_flow()
+        return Response(auth_url)
 
 class SetGauthTokenView(APIView):
 
@@ -92,3 +98,18 @@ class SetGauthTokenView(APIView):
         user_info.save()
 
         return Response("Drive Authentication Successful", status=status.HTTP_201_CREATED)  
+
+class SetDropBoxTokenView(APIView):
+
+    def post(self, request):
+        # generating the access token
+        access_token = get_dropbox_auth_token(code=request.data['code'])
+        
+        # saving the access token to the DB
+        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
+        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        user_info = UserInfo.objects.get(username=jwt_token['username'])
+        user_info.dropbox_token = access_token
+        user_info.save()
+
+        return Response("Dropbox Authentication Successful", status=status.HTTP_201_CREATED)
