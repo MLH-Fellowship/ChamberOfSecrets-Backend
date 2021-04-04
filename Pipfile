@@ -15,6 +15,7 @@ google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 djangorestframework-simplejwt = "*"
 pyjwt = "==1.7.1"
+dropbox = "*"
 
 [dev-packages]
 
