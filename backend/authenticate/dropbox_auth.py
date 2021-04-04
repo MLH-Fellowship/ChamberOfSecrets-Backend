@@ -1,5 +1,6 @@
 from dropbox import DropboxOAuth2FlowNoRedirect
 from .ENV import dropbox_app_key, dropbox_app_secret
+from .models import UserInfo 
 
 SCOPES = ['files.content.read', 'files.content.write']
 

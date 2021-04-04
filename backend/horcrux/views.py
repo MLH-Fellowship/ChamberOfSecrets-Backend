@@ -2,6 +2,7 @@ import os
 import jwt
 import json
 from datetime import datetime
+import dropbox
 
 from django.conf import settings
 from django.shortcuts import render
@@ -22,6 +23,7 @@ from .serializers import FileUploadSerializer, FileDataSerializer, UserFileSeria
 
 from authenticate.google_auth import check_google_auth_token, generate_google_token_from_db
 from authenticate.dropbox_auth import check_dropbox_auth_token, generate_dropbox_token_from_db
+from authenticate.models import UserInfo 
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -65,33 +67,36 @@ class FileUploadView(APIView):
                 os.remove(file_path)
 
             # uploading on google drive
-            if check_google_auth_token(user=username):
-                creds = generate_google_token_from_db(user=username)
+            if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
+                g_creds = generate_google_token_from_db(user=username)  # google drive creds
+                d_creds = generate_dropbox_token_from_db(user=username)  # dropbox creds
+                # building google drive service
+                g_service = build('drive', 'v3', credentials=g_creds)
+                # building dropbox service
+                d_service = dropbox.Dropbox(d_creds)
                 # getting file dir
                 file_dir = os.getcwd() + '\media\splits'   
                 files = os.listdir(file_dir)
                 files.sort()
-                # list to store file ids
-                fid_list = []
-                # building the google drive service
-                service = build('drive', 'v3', credentials=creds)
                 # uploading on google drive
+                uploaded_file = g_service.files().create(media_body=MediaFileUpload(os.path.join(file_dir, files[0]), 
+                                                                                  mimetype='*/*'), fields='id').execute()
+                split_1 = uploaded_file.get('id')
+                uploaded_file = g_service.files().create(media_body=MediaFileUpload(os.path.join(file_dir, files[2]), 
+                                                                                  mimetype='*/*'), fields='id').execute()
+                split_3 = uploaded_file.get('id')
+                uploaded_file = None
+                # uploading on dropbox
+                split_2 = d_location = f"/DigiCrux/{str((datetime.now() - datetime(2001, 11, 4)).seconds)}"  # time in seconds from release of first Harry Potter movie
+                with open(os.path.join(file_dir, files[1]), "rb") as f: 
+                    d_service.files_upload(f.read(), d_location, mode=dropbox.files.WriteMode.overwrite)
+                # removing the splits
                 for file in files:
-                    file_path = os.path.join(file_dir, file)
-                    print(file_path)
-                    media = MediaFileUpload(file_path, mimetype='*/*')
-                    uploaded_file = service.files().create(media_body=media, fields='id').execute()
-                    fid_list.append(uploaded_file.get('id'))
-                    media = None
-                    uploaded_file = None 
-                    # removing the splits
-                    if os.path.exists(file_path):
-                        os.remove(file_path)
+                    os.remove(os.path.join(file_dir, file)) 
             else:
                 return Response(status=status.HTTP_409_CONFLICT)
 
-            # creating a log in FileData db table
-            split_1, split_2, split_3 = fid_list
+            # creating a log in FileData db table 
             file_data = {'file_name':file_name, 'split_1':split_1, 'split_2':split_2,'split_3':split_3}
             serializer_filedata = FileDataSerializer(data=file_data)
             if serializer_filedata.is_valid():
