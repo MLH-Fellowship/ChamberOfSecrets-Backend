@@ -67,9 +67,13 @@ class FileUploadView(APIView):
                     media = MediaFileUpload(file_path, mimetype='*/*')
                     uploaded_file = service.files().create(media_body=media, fields='id').execute()
                     fid_list.append(uploaded_file.get('id'))
+                    media = None
+                    uploaded_file = None 
+                    # removing the splits
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
             else:
                 return Response(status=status.HTTP_409_CONFLICT)
-
 
             # creating a log in FileData db table
             user = User.objects.get(username=jwt_token['username'])
@@ -81,17 +85,6 @@ class FileUploadView(APIView):
             serializer_filedata = FileDataSerializer(data=file_data)
             if serializer_filedata.is_valid():
                 serializer_filedata.save(username=user)  # creates FileData instance
-
-            # deleting the file splits TODO: Deleting the last horcrux is throwing error. Fix it
-            n = 0
-            for file in files:
-                n += 1
-                if n == 3: 
-                    break
-                file_path = os.path.join(file_dir, file)
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
