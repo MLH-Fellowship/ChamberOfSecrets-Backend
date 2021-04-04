@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os.path
+import json 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow 
 from google.auth.transport.requests import Request
@@ -17,12 +18,13 @@ def check_auth_token(user):
     Args:
         user: Username of the user
     Returns:
-        Bool: True, if the token exists, False otherwise.
+        Bool: True, if the token exists, False otherwise. 
     """
-    user = UserInfo.objects.get(username=user)
-    if user.gdrive_token == "":
+    user_info = UserInfo.objects.get(username=user)
+    if user_info.gdrive_token == None:
         return False
-
+    return True
+ 
 
 def google_oauth_flow():
     """Sets up flow for user auth via Google OAuth
@@ -49,7 +51,22 @@ def get_auth_token(code):
     return access_token.to_json() 
 
 
-
+def generate_token_from_db(user):
+    """Fetches the token string from the db and regenerates access token
+    Args:
+        user: Username of the user
+    Returns:
+        creds: Access token for the user's Google Drive
+    """
+    user_info = UserInfo.objects.get(username=user)
+    creds = Credentials.from_authorized_user_info(json.loads(user_info.gdrive_token), scopes=SCOPES)
+    
+    # if credentials have expired, refresh them
+    if creds and creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        user_info.gdrive_token = creds.to_json()
+        user_info.save()
+    return creds
 
 
 
