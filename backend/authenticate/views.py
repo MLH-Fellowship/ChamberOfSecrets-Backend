@@ -69,20 +69,30 @@ class UserSignupView(APIView):
         return Response(serializer_user.errors, status=status.HTTP_400_BAD_REQUEST)  # returns response error code
 
 
-# API endpoint to fetch the google auth url
-class GetGauthUrlView(APIView):
 
+class GetGauthUrlView(APIView):
+    """
+    GET API endpoint to fetch the google auth url
+    """
     def get(self, request):
         auth_url = google_oauth_flow()
         return Response(auth_url)
 
-# API endpoint to fetch the dropbox auth url
+
 class GetDropboxauthUrlView(APIView):
+    """
+    GET API endpoint to fetch the dropbox auth url
+    """
     def get(self, request):
         auth_url = dropbox_oauth_flow()
         return Response(auth_url)
 
+
+
 class SetGauthTokenView(APIView):
+    """
+    POST API endpoint to set the user's Google Drive access token.
+    """
 
     def post(self, request):
         # generating the access token
@@ -98,6 +108,9 @@ class SetGauthTokenView(APIView):
         return Response("Drive Authentication Successful", status=status.HTTP_201_CREATED)  
 
 class SetDropBoxTokenView(APIView):
+    """
+    POST API endpoint to set the user's Dropbox access token.
+    """
 
     def post(self, request):
         # generating the access token

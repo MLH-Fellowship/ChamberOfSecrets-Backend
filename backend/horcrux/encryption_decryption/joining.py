@@ -2,15 +2,23 @@ import os, sys
 readsize = 1024
 
 def join(fromdir, tofile):
+    """Rejoins encrypted horcruxes into a single encrypted file.
+    Args-
+        fromdir::str: Path to the directory where the files are getting stored.
+        tofile::str: Path of the file that the encrypted horcruxes will be combined into.
+    Returns-
+        None
+    """
     output = open(tofile, 'wb')
     parts  = os.listdir(fromdir)
     parts.sort(  )
     for filename in parts:
         filepath = os.path.join(fromdir, filename)
         fileobj  = open(filepath, 'rb')
-        while 1:
+        while True:
             filebytes = fileobj.read(readsize)
-            if not filebytes: break
+            if not filebytes: 
+                break
             output.write(filebytes)
         fileobj.close(  )
     output.close(  )

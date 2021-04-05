@@ -30,6 +30,7 @@ class FileDataSerializer(serializers.Serializer):
         model = FileData
         fields = ('file_name', 'split_1', 'split_2','split_3')
 
+# serializer to serialize User's files
 class UserFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileData
