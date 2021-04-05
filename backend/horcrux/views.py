@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.viewsets import ViewSet
-from rest_framework import status 
+from rest_framework import status as s
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -96,15 +96,15 @@ class FileUploadView(APIView):
                 for file in files:
                     os.remove(os.path.join(file_dir, file)) 
             else:
-                return Response(status=status.HTTP_409_CONFLICT)
+                return Response(status=s.HTTP_409_CONFLICT)
 
             # creating a log in FileData db table 
             file_data = {'file_name':file_name, 'split_1':split_1, 'split_2':split_2,'split_3':split_3}
             serializer_filedata = FileDataSerializer(data=file_data)
             if serializer_filedata.is_valid():
                 serializer_filedata.save(username=user)  # creates FileData instance
-            return Response({"file_uploaded": file_name}, status=status.HTTP_201_CREATED) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"file_uploaded": file_name}, status=s.HTTP_201_CREATED) 
+        return Response(serializer.errors, status=s.HTTP_400_BAD_REQUEST)
 
 
 class DownloadFileView(APIView):
@@ -127,7 +127,7 @@ class DownloadFileView(APIView):
             split_2 = file_record.split_2  # dropbox file 
             split_3 = file_record.split_3  # gdrive file id 
         except ObjectDoesNotExist:
-            return Response("File not found!", status=status.HTTP_404_NOT_FOUND)
+            return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
 
         # downloading the splits
         if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
