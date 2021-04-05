@@ -13,7 +13,7 @@ from .ENV import client_config
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
 
-def check_auth_token(user):
+def check_google_auth_token(user):
     """Checks if the user oauth token is already stored in the database.
     Args:
         user: Username of the user
@@ -37,7 +37,7 @@ def google_oauth_flow():
     return auth_url
 
 
-def get_auth_token(code):
+def get_google_auth_token(code):
     """Veryfies the authorization code and generates access token for the user
     Args:
         flow: google_auth_oauthlib.flow.Flow object
@@ -51,7 +51,7 @@ def get_auth_token(code):
     return access_token.to_json() 
 
 
-def generate_token_from_db(user):
+def generate_google_token_from_db(user):
     """Fetches the token string from the db and regenerates access token
     Args:
         user: Username of the user

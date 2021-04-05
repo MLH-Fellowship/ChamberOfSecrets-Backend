@@ -1,9 +1,9 @@
 import sys, os
 import math
 
-def split(fromfile, todir): 
-    filesize=os.path.getsize(fromfile)
-    chunksize=math.ceil(float(filesize)/3)
+def split(fromfile, todir, split_name): 
+    filesize = os.path.getsize(fromfile)
+    chunksize = math.ceil(float(filesize)/3)
     if not os.path.exists(todir):                  # caller handles errors
         os.mkdir(todir)                            # make dir, read/write parts
     else:
@@ -11,11 +11,12 @@ def split(fromfile, todir):
             os.remove(os.path.join(todir, fname)) 
     partnum = 0
     input = open(fromfile, 'rb')                   # use binary mode on Windows
-    while 1:                                       # eof=empty string from read
+    while True:                                    # eof = empty string from read
         chunk = input.read(chunksize)              # get next part <= chunksize
-        if not chunk: break
-        partnum  = partnum+1
-        filename = os.path.join(todir, ('part%04d' % partnum))
+        if not chunk: 
+            break
+        partnum  = partnum + 1
+        filename = os.path.join(todir, f"{split_name}0{partnum}")
         fileobj  = open(filename, 'wb')
         fileobj.write(chunk)
         fileobj.close()                            # or simply open(  ).write(  )

@@ -12,7 +12,7 @@ from rest_framework_jwt.settings import api_settings
 
 from .serializers import UserSerializer, UserSerializerWithToken, UserInfoSerializer
 from .keys import generate_private_key, generate_encrypted_public_key
-from .google_auth import SCOPES, check_auth_token, google_oauth_flow, get_auth_token
+from .google_auth import google_oauth_flow, get_google_auth_token
 from .dropbox_auth import dropbox_oauth_flow, get_dropbox_auth_token
 from .models import UserInfo
 
@@ -29,18 +29,9 @@ class CurrentUserView(APIView):
         return Response(serializer.data) 
 
 
-class UserListView(APIView):
+class UserSignupView(APIView):
     """
     Create a new user via sign-up.
-    
-    JSON format:
-
-    {
-        "username":"",
-        "password":"",
-        "auth_per_upload":"True/False"
-    }
-
     """
 
     permission_classes = (permissions.AllowAny,)
@@ -59,7 +50,14 @@ class UserListView(APIView):
             serializer_user.save()  # saves the user model
             if serializer_userinfo.is_valid():
                 user = User.objects.get(username=request.data['username'])
-                serializer_userinfo.save(username=user)  # save userinfo model
+                
+                # updating firstname and lastname once the user is created
+                user.first_name = request.data['firstname']
+                user.last_name = request.data['lastname']
+                user.save()
+                
+                # save userinfo model 
+                serializer_userinfo.save(username=user)  
                 serializer_user_data = serializer_user.data  # creating a copy of serializer.data
 
                 # generating private key jwt
@@ -88,7 +86,7 @@ class SetGauthTokenView(APIView):
 
     def post(self, request):
         # generating the access token
-        access_token = get_auth_token(code=request.data['code'])
+        access_token = get_google_auth_token(code=request.data['code'])
         
         # saving the access token to the DB
         jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  

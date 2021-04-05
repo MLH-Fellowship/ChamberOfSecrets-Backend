@@ -3,6 +3,10 @@ ENV.py
 credentials.json
 token.json
 
+# django migrations
+backend/authenticate/migrations/*
+backend/horcrux/migrations/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
