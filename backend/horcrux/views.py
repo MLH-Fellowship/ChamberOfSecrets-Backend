@@ -128,7 +128,6 @@ class DownloadFileView(APIView):
             split_3 = file_record.split_3  # gdrive file id 
         except ObjectDoesNotExist:
             return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
-
         # downloading the splits
         if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
             g_creds = generate_google_token_from_db(user=username)  # google drive creds
@@ -151,20 +150,20 @@ class DownloadFileView(APIView):
                 fh.seek(0)
                 with open(os.path.join(file_dir, f"{file_name}0{i}"), "wb") as f:  
                     f.write(fh.read())
-
-        # join and decrypt the file
-        if(file_name):
-            filepath = r"\media\files\\"   
-            filepath = os.getcwd() + filepath + file_name
-            decrypt(filepath, os.getcwd() + '\media\splits', private_key, username)
-            with open(filepath, "rb") as f:
-                print("hello")
-                response = HttpResponse(f)
-                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
-                # deleting the splits from storage
-                for file in os.listdir(file_dir):
-                    os.remove(os.path.join(file_dir, file)) 
-                return response 
+            # join and decrypt the file
+            if(file_name):
+                filepath = r"\media\files\\"   
+                filepath = os.getcwd() + filepath + file_name
+                decrypt(filepath, os.getcwd() + '\media\splits', private_key, username)
+                with open(filepath, "rb") as f:
+                    print("hello")
+                    response = HttpResponse(f)
+                    response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
+                    # deleting the splits from storage
+                    for file in os.listdir(file_dir):
+                        os.remove(os.path.join(file_dir, file)) 
+                    return response
+        return Response(status=s.HTTP_500_INTERNAL_SERVER_ERROR) 
 
 
 # GET api that fetches the list of files owned by the user   
