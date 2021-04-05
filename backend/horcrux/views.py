@@ -1,3 +1,4 @@
+import io
 import os
 import jwt
 import json
@@ -63,8 +64,9 @@ class FileUploadView(APIView):
             encrypt(file_path, os.getcwd()+'\media\splits', request.data['private_key'], username, file_name)
             # delete file from DB and file storage
             FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            media_files = os.getcwd()+ r"\media\files"  
+            for file in os.listdir(media_files):
+                os.remove(os.path.join(media_files, file))
 
             # uploading on google drive
             if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
@@ -111,26 +113,58 @@ class DownloadFileView(APIView):
     """
                 
     def post(self, request): 
-        file = request.data['file_name']
+        file_name = request.data['file_name']
         private_key = request.data['private_key']
         jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
         jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-        '''
-        1. Query the file data model for username=username and filename=filename
-        2. Get horcruxes from different places and place them in media/splits folder
-        '''
-        if(file):
-            filepath=r'\media\files'+"\\"
-            filepath=os.getcwd()+filepath+file
-            print("filepath",filepath)
-            decrypt(filepath, os.getcwd()+'\media\splits',private_key, jwt_token['username'])
-            with open(filepath, "rb") as file:
+        
+        # fetching the file record
+        username = jwt_token['username']
+        user = User.objects.get(username=username)
+        try:
+            file_record = FileData.objects.get(username=user, file_name=file_name)
+            split_1 = file_record.split_1  # gdrive file id
+            split_2 = file_record.split_2  # dropbox file 
+            split_3 = file_record.split_3  # gdrive file id 
+        except ObjectDoesNotExist:
+            return Response("File not found!", status=status.HTTP_404_NOT_FOUND)
+
+        # downloading the splits
+        if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
+            g_creds = generate_google_token_from_db(user=username)  # google drive creds
+            d_creds = generate_dropbox_token_from_db(user=username)  # dropbox creds
+            # building google drive service
+            g_service = build('drive', 'v3', credentials=g_creds)
+            # building dropbox service 
+            d_service = dropbox.Dropbox(d_creds)
+            file_dir = os.getcwd() + '\media\splits'  # dir for file downloads
+            # downloading from dropbox
+            d_service.files_download_to_file(os.path.join(file_dir, f"{file_name}02"), split_2)
+            # downloading from gdrive
+            for i, split in zip((1, 3), (split_1, split_3)):
+                request = g_service.files().get_media(fileId=split)
+                fh = io.BytesIO()
+                downloader = MediaIoBaseDownload(fh, request)
+                done = False
+                while done is False:
+                    status, done = downloader.next_chunk()
+                fh.seek(0)
+                with open(os.path.join(file_dir, f"{file_name}0{i}"), "wb") as f:  
+                    f.write(fh.read())
+
+        # join and decrypt the file
+        if(file_name):
+            filepath = r"\media\files\\"   
+            filepath = os.getcwd() + filepath + file_name
+            decrypt(filepath, os.getcwd() + '\media\splits', private_key, username)
+            with open(filepath, "rb") as f:
                 print("hello")
-                response = HttpResponse(file)
-                filename = "1-1-intro.pdf"
-                response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-                print(type(response))
-                return response
+                response = HttpResponse(f)
+                response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
+                # deleting the splits from storage
+                for file in os.listdir(file_dir):
+                    os.remove(os.path.join(file_dir, file)) 
+                return response 
 
 
 # GET api that fetches the list of files owned by the user   
