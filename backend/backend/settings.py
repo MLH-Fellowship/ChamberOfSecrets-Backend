@@ -78,7 +78,7 @@ REST_FRAMEWORK = {
 # jwt settings
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'backend.utils.my_jwt_response_handler',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=60),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(minutes=300), 
 }
 
 # cors settings
