@@ -183,7 +183,7 @@ class FileDeleteView(APIView):
         file_name = request.data['file_name']
         # check if the file record exists in the database
         try:
-            file_record = FileData.objects.get(username=user, file_name=file_name)
+            file_record = FileData.objects.get(username=username, file_name=file_name)
         except ObjectDoesNotExist:
             return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
         # downloading the splits
