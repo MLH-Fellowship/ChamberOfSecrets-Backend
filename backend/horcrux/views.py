@@ -180,7 +180,7 @@ class FileDeleteView(APIView):
         jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
         jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
         username = jwt_token['username']
-
+        file_name = request.data['file_name']
         # check if the file record exists in the database
         try:
             file_record = FileData.objects.get(username=user, file_name=file_name)
