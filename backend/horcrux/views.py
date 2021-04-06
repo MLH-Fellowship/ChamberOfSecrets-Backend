@@ -31,8 +31,11 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 
 
-# POST API that lets user upload a file, divides it into horcruxes and uploads it on various storage platforms 
 class FileUploadView(APIView):
+    """
+    POST API that lets user upload a file, divides it into horcruxes 
+    and uploads it on various storage platforms 
+    """
     serializer_class = FileUploadSerializer
     parser_classes = (MultiPartParser, FormParser)
 
@@ -108,7 +111,8 @@ class FileUploadView(APIView):
 
 
 class DownloadFileView(APIView):
-    """Downloads the horcurxes from user's file storages then combines+decrypts 
+    """
+    Downloads the horcurxes from user's file storages then combines+decrypts 
     the horcruxes back into the original file which is sent back to the user.
     """
                 
@@ -166,8 +170,52 @@ class DownloadFileView(APIView):
         return Response(status=s.HTTP_500_INTERNAL_SERVER_ERROR) 
 
 
-# GET api that fetches the list of files owned by the user   
+
+class FileDeleteView(APIView):
+    """
+    Deletes file record from the database, along with the horcruxes from the file storages.
+    """
+
+    def post(self, request):
+        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
+        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        username = jwt_token['username']
+        file_name = request.data['file_name']
+        # check if the file record exists in the database
+        try:
+            file_record = FileData.objects.get(username=username, file_name=file_name)
+        except ObjectDoesNotExist:
+            return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
+        # downloading the splits
+        if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
+            g_creds = generate_google_token_from_db(user=username)  # google drive creds
+            d_creds = generate_dropbox_token_from_db(user=username)  # dropbox creds
+            # building google drive service
+            g_service = build('drive', 'v3', credentials=g_creds)
+            # building dropbox service 
+            d_service = dropbox.Dropbox(d_creds)
+            # deleting horcruxes on gdrive
+            try:
+                g_service.files().delete(fileId=file_record.split_1).execute()
+                g_service.files().delete(fileId=file_record.split_3).execute()
+            except:
+                return Response("Could not delete from Google Drive", status=s.HTTP_417_EXPECTATION_FAILED)
+            # deleting horcrux on dropbox 
+            try:
+                d_service.files_delete_v2(file_record.split_2)
+            except:
+                return Response("Could not delete from Dropbox", status=s.HTTP_417_EXPECTATION_FAILED)
+            # deleting record from database
+            file_record.delete()
+
+            return Response("File deleted successfully", status=s.HTTP_200_OK)
+            
+
+   
 class UserFileView(APIView):
+    """
+    GET api that fetches the list of files owned by the user.
+    """
     serializer_class = UserFileSerializer
     
     def list(self, request):
@@ -179,6 +227,7 @@ class UserFileView(APIView):
         user_files = FileData.objects.filter(username=jwt_token['username'])
         serializer = UserFileSerializer(user_files, many=True)
         return Response(serializer.data) 
+
 
 
 

@@ -1,7 +1,15 @@
 import sys, os
 import math
 
-def split(fromfile, todir, split_name): 
+def split(fromfile, todir, split_name):
+    """Splits a given encrypted file into 3 horcruxes.
+    Args-
+        fromfile::str: Path of the file to be splitted
+        todir::str: Path of the directory where the splits are to be created
+        split_name::str: Part of the name of the split that is to be created
+    Returns-
+        partnum
+    """ 
     filesize = os.path.getsize(fromfile)
     chunksize = math.ceil(float(filesize)/3)
     if not os.path.exists(todir):                  # caller handles errors

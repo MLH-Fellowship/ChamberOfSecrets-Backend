@@ -16,11 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-# token auth module
-from rest_framework_jwt.views import obtain_jwt_token
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('authenticate/', include('authenticate.urls')),
-    path('horcrux/', include('horcrux.urls')),
+    path('authenticate/', include('authenticate.urls')),  # endpoint mapping for authenticate app 
+    path('horcrux/', include('horcrux.urls')),  # endpoint mapping for horcurx app
 ]
