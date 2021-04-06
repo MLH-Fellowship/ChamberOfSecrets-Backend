@@ -141,4 +141,5 @@ dmypy.json
 .pyre/
 
 #ignoring all storage files uploaded
-media/
+media/files
+media/splits

@@ -64,10 +64,10 @@ class FileUploadView(APIView):
                 pass
             
             # file encryption and splitting
-            encrypt(file_path, os.getcwd()+'\media\splits', request.data['private_key'], username, file_name)
+            encrypt(file_path, os.path.join(os.getcwd(), 'media', 'splits'), request.data['private_key'], username, file_name)
             # delete file from DB and file storage
             FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()
-            media_files = os.getcwd()+ r"\media\files"  
+            media_files = os.path.join(os.getcwd(), "media", "files")  
             for file in os.listdir(media_files):
                 print(file)
                 os.remove(os.path.join(media_files, file))
@@ -81,7 +81,7 @@ class FileUploadView(APIView):
                 # building dropbox service
                 d_service = dropbox.Dropbox(d_creds)
                 # getting file dir
-                file_dir = os.getcwd() + '\media\splits'   
+                file_dir = os.path.join(os.getcwd(), 'media', 'splits')   
                 files = os.listdir(file_dir)
                 files.sort()
                 # uploading on google drive
@@ -141,7 +141,7 @@ class DownloadFileView(APIView):
             g_service = build('drive', 'v3', credentials=g_creds)
             # building dropbox service 
             d_service = dropbox.Dropbox(d_creds)
-            file_dir = os.getcwd() + '\media\splits'  # dir for file downloads
+            file_dir = os.path.join(os.getcwd(), 'media', 'splits')  # dir for file downloads
             # downloading from dropbox
             d_service.files_download_to_file(os.path.join(file_dir, f"{file_name}02"), split_2)
             # downloading from gdrive
@@ -156,12 +156,10 @@ class DownloadFileView(APIView):
                 with open(os.path.join(file_dir, f"{file_name}0{i}"), "wb") as f:  
                     f.write(fh.read())
             # join and decrypt the file
-            if(file_name):
-                filepath = r"\media\files\\"   
-                filepath = os.getcwd() + filepath + file_name
-                decrypt(filepath, os.getcwd() + '\media\splits', private_key, username)
+            if(file_name):  
+                filepath = os.path.join(os.getcwd(), "media", "files", file_name)
+                decrypt(filepath, os.path.join(os.getcwd(), 'media', 'splits'), private_key, username)
                 with open(filepath, "rb") as f:
-                    print("hello")
                     response = HttpResponse(f)
                     response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
                     # deleting the splits from storage

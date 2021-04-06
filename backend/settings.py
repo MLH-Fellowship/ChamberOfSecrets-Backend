@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv("APP_SECRET_KEY", 'd0%f3tier9e)-x_n^cywd=epj3puh_t*$#$%0e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['chamber-of-secrets-mlh.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['chamber-of-secrets-mlh.herokuapp.com', '127.0.0.1', 'localhost',]
 
 
 # Application definition
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     # external dependencies
     'rest_framework',  # django REST framework
     'corsheaders',  # app for cors functionality
-    'rest_framework_simplejwt',
+    'rest_framework_simplejwt',  # simple jwt app
+    'whitenoise.runserver_nostatic',  # whitenoise
     
     # custom apps
     'authenticate',  # auth app
@@ -50,7 +51,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # cors middleware (external)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,6 +58,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # cors middleware (external)
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # whitenoise middleware (external)
 ]
 
 
@@ -165,6 +167,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#location where django collect all static files
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # media root settings for file storage
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
