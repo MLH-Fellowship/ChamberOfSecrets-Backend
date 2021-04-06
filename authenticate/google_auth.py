@@ -8,7 +8,7 @@ from google.oauth2.credentials import Credentials
 
 from .models import UserInfo
 
-client_config = json.loads(os.getenv("GOOGLE_CLIENT_CONFIG")) 
+client_config = json.loads(os.getenv("GOOGLE_CLIENT_CONFIG", '{"dummy-client-config":"replace-this-with-your-client-config"}')) 
 
 # visit https://developers.google.com/drive/api/v3/about-auth for more scopes
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
