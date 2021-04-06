@@ -69,6 +69,7 @@ class FileUploadView(APIView):
             FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()
             media_files = os.getcwd()+ r"\media\files"  
             for file in os.listdir(media_files):
+                print(file)
                 os.remove(os.path.join(media_files, file))
 
             # uploading on google drive
