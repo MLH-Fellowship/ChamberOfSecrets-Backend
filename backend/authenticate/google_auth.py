@@ -1,5 +1,5 @@
 from __future__ import print_function
-import os.path
+import os
 import json 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import Flow 
@@ -7,7 +7,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 
 from .models import UserInfo
-from .ENV import client_config
+
+client_config = json.loads(os.getenv("GOOGLE_CLIENT_CONFIG"))
 
 # visit https://developers.google.com/drive/api/v3/about-auth for more scopes
 SCOPES = ['https://www.googleapis.com/auth/drive.file']

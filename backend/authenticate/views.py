@@ -19,6 +19,13 @@ from .models import UserInfo
 
 # Create your views here.
 
+class CheckBackendView(APIView):
+    """Test if the backend is responding."""
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        return Response("It's working!", status=status.HTTP_200_OK)
+
 
 class CurrentUserView(APIView):
     """

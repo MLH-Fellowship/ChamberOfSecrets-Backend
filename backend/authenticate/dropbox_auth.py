@@ -1,6 +1,9 @@
+import os
 from dropbox import DropboxOAuth2FlowNoRedirect
-from .ENV import dropbox_app_key, dropbox_app_secret
 from .models import UserInfo 
+
+dropbox_app_key = os.getenv("DROPBOX_APP_KEY") 
+dropbox_app_secret = os.getenv("DROPBOX_APP_SECRET")
 
 SCOPES = ['files.content.read', 'files.content.write']
 
