@@ -44,18 +44,28 @@ class FileUploadView(APIView):
 
 
     def post(self, request):
+        
+        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
+        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        username = jwt_token['username']
+        user = User.objects.get(username=username)
+        
+        try:
+            request.data['file_uploaded'].name = request.data['file_uploaded'].name
+            file_name = request.data['file_uploaded'].name
+            files = FileUpload.objects.all().filter(username=user)
+            if len(files) > 0: 
+                for file in files:
+                    file.delete() 
+        except:
+            pass
         serializer = FileUploadSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(username=user)
 
             file_path = os.getcwd() + serializer.data['file_uploaded'].replace('/', '\\')  # getting file path
-            jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
-            jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-            username = jwt_token['username']
 
-            # check if an entry with the same name already exists
-            user = User.objects.get(username=username) 
-            file_name = request.data['file_uploaded'].name
+            # check if an entry with the same name already exists 
             try:
                 file_exists = FileData.objects.get(username=user, file_name=file_name)
                 unique_id = str((datetime.now() - file_exists.upload_date.replace(tzinfo=None)).seconds) + "_" 
@@ -69,8 +79,7 @@ class FileUploadView(APIView):
             FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()
             media_files = os.path.join(os.getcwd(), "media", "files")  
             for file in os.listdir(media_files):
-                print(file)
-                os.remove(os.path.join(media_files, file))
+                os.remove(os.path.join(media_files, file))  
 
             # uploading on google drive
             if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):

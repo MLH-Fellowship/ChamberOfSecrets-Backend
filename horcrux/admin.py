@@ -14,7 +14,7 @@ class FileDataAdmin(ModelAdmin):
 # registering the FileUpload model that temporarily stored users' uploaded files 
 class FileUploadAdmin(ModelAdmin):
     model = FileUpload
-    list_display = ['file_uploaded',] 
+    list_display = ['username', 'file_uploaded',] 
 
 
 admin.site.register(FileData, FileDataAdmin)
