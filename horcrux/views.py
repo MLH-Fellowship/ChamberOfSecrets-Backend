@@ -61,10 +61,6 @@ class FileUploadView(APIView):
             serializer.save(username=user)
 
             file_path = os.getcwd() + serializer.data['file_uploaded'] #.replace('/', '\\')  # getting file path
-            print(serializer.data)
-            print("This is working")
-            print(file_path)
-            print(serializer.data['file_uploaded'][7:])
             # check if an entry with the same name already exists 
             try:
                 file_exists = FileData.objects.get(username=user, file_name=file_name)
@@ -73,16 +69,15 @@ class FileUploadView(APIView):
             except ObjectDoesNotExist:
                 pass
             
-
-            
+            try:
                 # file encryption and splitting
-            encrypt(file_path, splits_dir, request.data['private_key'], username, file_name)
-        
-            # delete file from DB and file storage
-            FileUpload.objects.get(username=user, file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
-                # for file in os.listdir(media_dir):
-                #     os.remove(os.path.join(media_dir, file))
-                # return Response({"message": "You entered an invalid private key!"}, status=s.HTTP_400_BAD_REQUEST) 
+                encrypt(file_path, splits_dir, request.data['private_key'], username, file_name)
+            except:
+                # delete file from DB and file storage
+                FileUpload.objects.get(username=user, file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
+                for file in os.listdir(media_dir):
+                    os.remove(os.path.join(media_dir, file))
+                return Response({"message": "You entered an invalid private key!"}, status=s.HTTP_400_BAD_REQUEST) 
 
             # delete file from DB and file storage
             FileUpload.objects.get(username=user, file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
