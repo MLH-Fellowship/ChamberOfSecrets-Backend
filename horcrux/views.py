@@ -21,14 +21,17 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .models import FileUpload, FileData 
 from .encryption_decryption.combined import encrypt, decrypt
 from .serializers import FileUploadSerializer, FileDataSerializer, UserFileSerializer
+from .utils import get_user_from_jwt, get_drive_services 
 
 from authenticate.google_auth import check_google_auth_token, generate_google_token_from_db
-from authenticate.dropbox_auth import check_dropbox_auth_token, generate_dropbox_token_from_db
+from authenticate.dropbox_auth import check_dropbox_auth_token, generate_dropbox_token_from_db, dropbox_app_key
 from authenticate.models import UserInfo 
 
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload 
 
+# global vars
+splits_dir = os.path.join(os.getcwd(), 'media', 'splits')  # directory where horcruxes are temp stored
+media_dir = os.path.join(os.getcwd(), "media", "files")  # dir where files are temp stored 
 
 
 class FileUploadView(APIView):
@@ -45,10 +48,8 @@ class FileUploadView(APIView):
 
     def post(self, request):
         
-        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
-        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-        username = jwt_token['username']
-        user = User.objects.get(username=username)
+        # getting username and User model object from JWT token
+        username, user = get_user_from_jwt(request)
         
         try:
             request.data['file_uploaded'].name = request.data['file_uploaded'].name
@@ -74,40 +75,34 @@ class FileUploadView(APIView):
                 pass
             
             # file encryption and splitting
-            encrypt(file_path, os.path.join(os.getcwd(), 'media', 'splits'), request.data['private_key'], username, file_name)
+            encrypt(file_path, splits_dir, request.data['private_key'], username, file_name)
             # delete file from DB and file storage
-            FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()
-            media_files = os.path.join(os.getcwd(), "media", "files")  
-            for file in os.listdir(media_files):
-                os.remove(os.path.join(media_files, file))  
+            FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
+            for file in os.listdir(media_dir):
+                os.remove(os.path.join(media_dir, file))  
 
             # uploading on google drive
             if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
-                g_creds = generate_google_token_from_db(user=username)  # google drive creds
-                d_creds = generate_dropbox_token_from_db(user=username)  # dropbox creds
-                # building google drive service
-                g_service = build('drive', 'v3', credentials=g_creds)
-                # building dropbox service
-                d_service = dropbox.Dropbox(d_creds)
-                # getting file dir
-                file_dir = os.path.join(os.getcwd(), 'media', 'splits')   
-                files = os.listdir(file_dir)
+                # generating drive services
+                g_service, d_service = get_drive_services(username)  
+                # getting files   
+                files = os.listdir(splits_dir)
                 files.sort()
                 # uploading on google drive
-                uploaded_file = g_service.files().create(media_body=MediaFileUpload(os.path.join(file_dir, files[0]), 
+                uploaded_file = g_service.files().create(media_body=MediaFileUpload(os.path.join(splits_dir, files[0]), 
                                                                                   mimetype='*/*'), fields='id').execute()
                 split_1 = uploaded_file.get('id')
-                uploaded_file = g_service.files().create(media_body=MediaFileUpload(os.path.join(file_dir, files[2]), 
+                uploaded_file = g_service.files().create(media_body=MediaFileUpload(os.path.join(splits_dir, files[2]), 
                                                                                   mimetype='*/*'), fields='id').execute()
                 split_3 = uploaded_file.get('id')
                 uploaded_file = None
                 # uploading on dropbox
                 split_2 = d_location = f"/DigiCrux/{str((datetime.now() - datetime(2001, 11, 4)).seconds)}"  # time in seconds from release of first Harry Potter movie
-                with open(os.path.join(file_dir, files[1]), "rb") as f: 
+                with open(os.path.join(splits_dir, files[1]), "rb") as f: 
                     d_service.files_upload(f.read(), d_location, mode=dropbox.files.WriteMode.overwrite)
                 # removing the splits
                 for file in files:
-                    os.remove(os.path.join(file_dir, file)) 
+                    os.remove(os.path.join(splits_dir, file)) 
             else:
                 return Response(status=s.HTTP_409_CONFLICT)
 
@@ -129,12 +124,9 @@ class DownloadFileView(APIView):
     def post(self, request): 
         file_name = request.data['file_name']
         private_key = request.data['private_key']
-        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]
-        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
+        # getting username and User model object from JWT token
+        username, user = get_user_from_jwt(request)
         
-        # fetching the file record
-        username = jwt_token['username']
-        user = User.objects.get(username=username)
         try:
             file_record = FileData.objects.get(username=user, file_name=file_name)
             split_1 = file_record.split_1  # gdrive file id
@@ -144,15 +136,10 @@ class DownloadFileView(APIView):
             return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
         # downloading the splits
         if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
-            g_creds = generate_google_token_from_db(user=username)  # google drive creds
-            d_creds = generate_dropbox_token_from_db(user=username)  # dropbox creds
-            # building google drive service
-            g_service = build('drive', 'v3', credentials=g_creds)
-            # building dropbox service 
-            d_service = dropbox.Dropbox(d_creds)
-            file_dir = os.path.join(os.getcwd(), 'media', 'splits')  # dir for file downloads
+            # generating drive services
+            g_service, d_service = get_drive_services(username) 
             # downloading from dropbox
-            d_service.files_download_to_file(os.path.join(file_dir, f"{file_name}02"), split_2)
+            d_service.files_download_to_file(os.path.join(splits_dir, f"{file_name}02"), split_2)
             # downloading from gdrive
             for i, split in zip((1, 3), (split_1, split_3)):
                 request = g_service.files().get_media(fileId=split)
@@ -162,18 +149,18 @@ class DownloadFileView(APIView):
                 while done is False:
                     status, done = downloader.next_chunk()
                 fh.seek(0)
-                with open(os.path.join(file_dir, f"{file_name}0{i}"), "wb") as f:  
+                with open(os.path.join(splits_dir, f"{file_name}0{i}"), "wb") as f:  
                     f.write(fh.read())
             # join and decrypt the file
             if(file_name):  
                 filepath = os.path.join(os.getcwd(), "media", "files", file_name)
-                decrypt(filepath, os.path.join(os.getcwd(), 'media', 'splits'), private_key, username)
+                decrypt(filepath, splits_dir, private_key, username)
                 with open(filepath, "rb") as f:
                     response = HttpResponse(f)
                     response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
                     # deleting the splits from storage
-                    for file in os.listdir(file_dir):
-                        os.remove(os.path.join(file_dir, file)) 
+                    for file in os.listdir(splits_dir):
+                        os.remove(os.path.join(splits_dir, file)) 
                     return response
         return Response(status=s.HTTP_500_INTERNAL_SERVER_ERROR) 
 
@@ -185,23 +172,20 @@ class FileDeleteView(APIView):
     """
 
     def post(self, request):
-        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
-        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-        username = jwt_token['username']
-
+        # getting username and User model object from JWT token
+        username, user = get_user_from_jwt(request)
         # check if the file record exists in the database
-        try:
+        file_name = request.data['file_name'] 
+        try: 
             file_record = FileData.objects.get(username=user, file_name=file_name)
+            print(file_record)
         except ObjectDoesNotExist:
             return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
+            pass
         # downloading the splits
         if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
-            g_creds = generate_google_token_from_db(user=username)  # google drive creds
-            d_creds = generate_dropbox_token_from_db(user=username)  # dropbox creds
-            # building google drive service
-            g_service = build('drive', 'v3', credentials=g_creds)
-            # building dropbox service 
-            d_service = dropbox.Dropbox(d_creds)
+            # generating drive services
+            g_service, d_service = get_drive_services(username) 
             # deleting horcruxes on gdrive
             try:
                 g_service.files().delete(fileId=file_record.split_1).execute()
@@ -214,7 +198,7 @@ class FileDeleteView(APIView):
             except:
                 return Response("Could not delete from Dropbox", status=s.HTTP_417_EXPECTATION_FAILED)
             # deleting record from database
-            file_record.delete()
+            file_record.delete() 
 
             return Response("File deleted successfully", status=s.HTTP_200_OK)
             
@@ -230,12 +214,13 @@ class UserFileView(APIView):
         return Response("GET API")
     
     def get(self, request):
-        jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
-        jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
-        user_files = FileData.objects.filter(username=jwt_token['username'])
-        serializer = UserFileSerializer(user_files, many=True)
-        return Response(serializer.data) 
+        # getting username and User model object from JWT token
+        username, user = get_user_from_jwt(request)
+        user_files = FileData.objects.filter(username=user)
+        serializer = UserFileSerializer(user_files, many=True) 
 
+        return Response(serializer.data) 
+ 
 
 
 

@@ -120,13 +120,13 @@ class SetDropBoxTokenView(APIView):
 
     def post(self, request):
         # generating the access token
-        access_token = get_dropbox_auth_token(code=request.data['code'])
+        token_json = get_dropbox_auth_token(code=request.data['code'])
         
         # saving the access token to the DB
         jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
         jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
         user_info = UserInfo.objects.get(username=jwt_token['username'])
-        user_info.dropbox_token = access_token
+        user_info.dropbox_token = token_json
         user_info.save()
 
         return Response("Dropbox Authentication Successful", status=status.HTTP_201_CREATED)
