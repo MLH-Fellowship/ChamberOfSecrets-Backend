@@ -71,6 +71,7 @@ class UserSignupView(APIView):
                 private_key_payload = {'private': str(private_key,'utf-8')}  # replace private key value with the generated one
                 private = jwt.encode(private_key_payload, settings.SECRET_KEY, algorithm='HS256').decode('utf-8')
                 serializer_user_data['private'] = private
+                print(private) 
                 return Response(serializer_user_data, status=status.HTTP_201_CREATED)  # returns response with JWT token
         return Response(serializer_user.errors, status=status.HTTP_400_BAD_REQUEST)  # returns response error code
 
