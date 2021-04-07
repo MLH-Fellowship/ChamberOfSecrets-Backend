@@ -24,7 +24,7 @@ class CheckBackendView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        return Response("It's working!", status=status.HTTP_200_OK)
+        return Response({"message": "It's working!"}, status=status.HTTP_200_OK)
 
 
 class CurrentUserView(APIView):
@@ -102,8 +102,10 @@ class SetGauthTokenView(APIView):
 
     def post(self, request):
         # generating the access token
-        access_token = get_google_auth_token(code=request.data['code'])
-        
+        try:
+            access_token = get_google_auth_token(code=request.data['code'])
+        except:
+            return Response({"message":"You entered a wrong authentication code."}, status=status.HTTP_400_BAD_REQUEST)
         # saving the access token to the DB
         jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
         jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -111,7 +113,7 @@ class SetGauthTokenView(APIView):
         user_info.gdrive_token = access_token
         user_info.save()
 
-        return Response("Drive Authentication Successful", status=status.HTTP_201_CREATED)  
+        return Response({"message": "Drive authentication successful"}, status=status.HTTP_201_CREATED)  
 
 class SetDropBoxTokenView(APIView):
     """
@@ -120,8 +122,10 @@ class SetDropBoxTokenView(APIView):
 
     def post(self, request):
         # generating the access token
-        token_json = get_dropbox_auth_token(code=request.data['code'])
-        
+        try:
+            token_json = get_dropbox_auth_token(code=request.data['code'])
+        except:
+            return Response({"message":"You entered a wrong authentication code."}, status=status.HTTP_400_BAD_REQUEST)
         # saving the access token to the DB
         jwt_token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  
         jwt_token = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -129,4 +133,4 @@ class SetDropBoxTokenView(APIView):
         user_info.dropbox_token = token_json
         user_info.save()
 
-        return Response("Dropbox Authentication Successful", status=status.HTTP_201_CREATED)
+        return Response({"message": "Dropbox authentication successful"}, status=status.HTTP_201_CREATED)
