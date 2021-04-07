@@ -22,4 +22,5 @@ class FileData(models.Model):
 
 # django model for temp file storage
 class FileUpload(models.Model):
+    username = models.ForeignKey(User, to_field="username", on_delete=models.CASCADE)
     file_uploaded = models.FileField(upload_to="files/")

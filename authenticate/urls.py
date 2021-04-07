@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import CurrentUserView, UserSignupView, GetGauthUrlView, SetGauthTokenView, GetDropboxauthUrlView, SetDropBoxTokenView
+from .views import CurrentUserView, UserSignupView, GetGauthUrlView, SetGauthTokenView, GetDropboxauthUrlView, SetDropBoxTokenView, CheckBackendView
 
 # token auth module
 from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
+    path('check/', CheckBackendView.as_view()),  # check to see if backend is responding
     path('login/', obtain_jwt_token),  # api for login auth
     path('signup/', UserSignupView.as_view()),  # api for sign up auth
     path('current_user/', CurrentUserView.as_view()),  # api to verify current user 
