@@ -61,7 +61,10 @@ class FileUploadView(APIView):
             serializer.save(username=user)
 
             file_path = os.getcwd() + serializer.data['file_uploaded'] #.replace('/', '\\')  # getting file path
-
+            print(serializer.data)
+            print("This is working")
+            print(file_path)
+            print(serializer.data['file_uploaded'][7:])
             # check if an entry with the same name already exists 
             try:
                 file_exists = FileData.objects.get(username=user, file_name=file_name)
