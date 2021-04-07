@@ -24,7 +24,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv("APP_SECRET_KEY", 'd0%f3tier9e)-x_n^cywd=epj3puh_t*$#$%0e+(1_3nrj1=08')  
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("APP_DEBUG", True)
+DEBUG = True
+
+# setting DEBUG False for deployment
+if "APP_DEBUG_FALSE" in os.environ:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['chamber-of-secrets-mlh.herokuapp.com', '127.0.0.1', 'localhost',]
 
