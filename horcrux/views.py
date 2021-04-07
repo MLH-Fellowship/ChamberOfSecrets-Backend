@@ -5,8 +5,6 @@ import json
 from datetime import datetime
 import dropbox
 
-from django.conf import settings
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,7 +13,6 @@ from rest_framework.viewsets import ViewSet
 from rest_framework import status as s
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import FileUpload, FileData 
@@ -23,9 +20,8 @@ from .encryption_decryption.combined import encrypt, decrypt
 from .serializers import FileUploadSerializer, FileDataSerializer, UserFileSerializer
 from .utils import get_user_from_jwt, get_drive_services 
 
-from authenticate.google_auth import check_google_auth_token, generate_google_token_from_db
-from authenticate.dropbox_auth import check_dropbox_auth_token, generate_dropbox_token_from_db, dropbox_app_key
-from authenticate.models import UserInfo 
+from authenticate.google_auth import check_google_auth_token
+from authenticate.dropbox_auth import check_dropbox_auth_token
 
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload 
 
@@ -74,11 +70,20 @@ class FileUploadView(APIView):
             except ObjectDoesNotExist:
                 pass
             
-            # file encryption and splitting
-            encrypt(file_path, splits_dir, request.data['private_key'], username, file_name)
+
+            try:
+                # file encryption and splitting
+                encrypt(file_path, splits_dir, request.data['private_key'], username, file_name)
+            except:
+                # delete file from DB and file storage
+                FileUpload.objects.get(username=user, file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
+                for file in os.listdir(media_dir):
+                    os.remove(os.path.join(media_dir, file))
+                return Response({"message": "You entered an invalid private key!"}, status=s.HTTP_400_BAD_REQUEST) 
+
             # delete file from DB and file storage
-            FileUpload.objects.get(file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
-            for file in os.listdir(media_dir):
+            FileUpload.objects.get(username=user, file_uploaded = serializer.data['file_uploaded'][7:]).delete()  
+            for file in os.listdir(media_dir): 
                 os.remove(os.path.join(media_dir, file))  
 
             # uploading on google drive
@@ -104,7 +109,10 @@ class FileUploadView(APIView):
                 for file in files:
                     os.remove(os.path.join(splits_dir, file)) 
             else:
-                return Response(status=s.HTTP_409_CONFLICT)
+                # removing the splits
+                for file in files:
+                    os.remove(os.path.join(splits_dir, file)) 
+                return Response({"message": "Can't access storage. Upload failed!"}, status=s.HTTP_409_CONFLICT)
 
             # creating a log in FileData db table 
             file_data = {'file_name':file_name, 'split_1':split_1, 'split_2':split_2,'split_3':split_3}
@@ -133,7 +141,7 @@ class DownloadFileView(APIView):
             split_2 = file_record.split_2  # dropbox file 
             split_3 = file_record.split_3  # gdrive file id 
         except ObjectDoesNotExist:
-            return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
+            return Response({"message": "File not found!"}, status=s.HTTP_404_NOT_FOUND)
         # downloading the splits
         if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
             # generating drive services
@@ -154,15 +162,24 @@ class DownloadFileView(APIView):
             # join and decrypt the file
             if(file_name):  
                 filepath = os.path.join(os.getcwd(), "media", "files", file_name)
-                decrypt(filepath, splits_dir, private_key, username)
+                try:
+                    decrypt(filepath, splits_dir, private_key, username)
+                except:
+                    # deleting the splits from storage
+                    for file in os.listdir(splits_dir):
+                        os.remove(os.path.join(splits_dir, file))
+                    return Response({"message": "You entered an invalid private key!"}, status=s.HTTP_400_BAD_REQUEST) 
                 with open(filepath, "rb") as f:
                     response = HttpResponse(f)
                     response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
                     # deleting the splits from storage
                     for file in os.listdir(splits_dir):
-                        os.remove(os.path.join(splits_dir, file)) 
+                        os.remove(os.path.join(splits_dir, file))
+                    # deleting file storage
+                    for file in os.listdir(media_dir):
+                        os.remove(os.path.join(media_dir, file)) 
                     return response
-        return Response(status=s.HTTP_500_INTERNAL_SERVER_ERROR) 
+        return Response({"message": "Can't access storage. Download failed!"}, status=s.HTTP_409_CONFLICT) 
 
 
 
@@ -180,7 +197,7 @@ class FileDeleteView(APIView):
             file_record = FileData.objects.get(username=user, file_name=file_name)
             print(file_record)
         except ObjectDoesNotExist:
-            return Response("File not found!", status=s.HTTP_404_NOT_FOUND)
+            return Response({"message": "File not found!"}, status=s.HTTP_404_NOT_FOUND)
             pass
         # downloading the splits
         if check_google_auth_token(user=username) and check_dropbox_auth_token(user=username):
@@ -191,16 +208,16 @@ class FileDeleteView(APIView):
                 g_service.files().delete(fileId=file_record.split_1).execute()
                 g_service.files().delete(fileId=file_record.split_3).execute()
             except:
-                return Response("Could not delete from Google Drive", status=s.HTTP_417_EXPECTATION_FAILED)
+                return Response({"message": "Could not delete from Google Drive"}, status=s.HTTP_417_EXPECTATION_FAILED)
             # deleting horcrux on dropbox 
             try:
                 d_service.files_delete_v2(file_record.split_2)
             except:
-                return Response("Could not delete from Dropbox", status=s.HTTP_417_EXPECTATION_FAILED)
+                return Response({"message": "Could not delete from Dropbox"}, status=s.HTTP_417_EXPECTATION_FAILED)
             # deleting record from database
             file_record.delete() 
 
-            return Response("File deleted successfully", status=s.HTTP_200_OK)
+            return Response({"message": "File deleted successfully"}, status=s.HTTP_200_OK)
             
 
    
