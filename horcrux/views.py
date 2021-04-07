@@ -60,8 +60,10 @@ class FileUploadView(APIView):
         if serializer.is_valid():
             serializer.save(username=user)
 
-            file_path = os.getcwd() + serializer.data['file_uploaded'].replace('/', '\\')  # getting file path
-
+            if os.name == 'nt':  # for windows
+                file_path = os.getcwd() + serializer.data['file_uploaded'].replace('/', '\\')  # getting file path
+            else:  # for mac/linux
+                file_path = os.getcwd() + serializer.data['file_uploaded']  # getting file path
             # check if an entry with the same name already exists 
             try:
                 file_exists = FileData.objects.get(username=user, file_name=file_name)
@@ -70,7 +72,6 @@ class FileUploadView(APIView):
             except ObjectDoesNotExist:
                 pass
             
-
             try:
                 # file encryption and splitting
                 encrypt(file_path, splits_dir, request.data['private_key'], username, file_name)
