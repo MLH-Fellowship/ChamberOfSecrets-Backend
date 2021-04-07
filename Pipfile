@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==2.2.19"
+djangorestframework = "*"
+djangorestframework-jwt = "*"
+django-cors-headers = "*"
+cryptography = "*"
+filesplit = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+djangorestframework-simplejwt = "*"
+pyjwt = "==1.7.1"
+dropbox = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
