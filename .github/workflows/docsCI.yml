@@ -2,9 +2,9 @@ name: docsCI
 
 on:
   pull_request:
-    branches: [aman_docs]
+    branches: [staging]
   push:
-    branches: [aman_docs]
+    branches: [staging]
 
 jobs:
   checks:
@@ -59,4 +59,4 @@ jobs:
           else
           npm i
           fi
-          GIT_USER=amansharma2910 USE_SSH=true CURRENT_BRANCH=aman_docs DEPLOYMENT_BRANCH=gh-pages yarn deploy
+          GIT_USER=amansharma2910 USE_SSH=true CURRENT_BRANCH=staging DEPLOYMENT_BRANCH=gh-pages yarn deploy
