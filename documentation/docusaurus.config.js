@@ -1,32 +1,36 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'Chamber of Secrets',
-  tagline: 'The tagline of my site',
+  tagline: 'Digi-locker redifined, inspired by Lord Voldermort.',
   url: 'https://github.com/MLH-Fellowship.github.io',
   baseUrl: '/ChamberOfSecrets-Backend/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'MLH-Fellowship', // Usually your GitHub org/user name.
-  projectName: 'ChamberOfSecrets-Backend', // Usually your repo name.
+  projectName: 'ChamberOfSecrets', // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: 'My Site',
+      title: 'Chamber of Secrets', 
       logo: {
         alt: 'My Site Logo',
         src: 'img/logo.svg',
       },
       items: [
         {
-          to: 'docs/',
+          to: 'docs/chamber-of-secrets',
           activeBasePath: 'docs',
           label: 'Docs',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
+          href: 'https://github.com/MLH-Fellowship/ChamberOfSecrets-Backend', 
+          label: 'GitHub-Server',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/MLH-Fellowship/DigiCrux', 
+          label: 'GitHub-Client',
           position: 'right',
         },
       ],
@@ -39,24 +43,7 @@ module.exports = {
           items: [
             {
               label: 'Getting Started',
-              to: 'docs/',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-            },
-            {
-              label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus',
+              to: 'docs/chamber-of-secrets',
             },
           ],
         },
@@ -64,17 +51,17 @@ module.exports = {
           title: 'More',
           items: [
             {
-              label: 'Blog',
-              to: 'blog',
+              label: 'GitHub-Server',
+              href: 'https://github.com/MLH-Fellowship/ChamberOfSecrets-Backend',
             },
             {
-              label: 'GitHub',
-              href: 'https://github.com/facebook/docusaurus',
+              label: 'GitHub-Client',
+              href: 'https://github.com/MLH-Fellowship/DigiCrux',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Chamber of Secrets, Inc. Built with Docusaurus.`,
     },
   },
   presets: [
@@ -85,13 +72,7 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl:
-            'https://github.com/facebook/docusaurus/edit/master/website/blog/',
+            'https://github.com/MLH-Fellowship/ChamberOfSecrets-Backend/documentation/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

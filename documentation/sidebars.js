@@ -2,14 +2,17 @@ module.exports = {
   docs: [
     {
       type: 'category',
-      label: 'Docusaurus Tutorial',
+      label: 'Getting Started',
       items: [
-        'getting-started',
-        'create-a-page',
-        'create-a-document',
-        'create-a-blog-post',
-        'markdown-features',
-        'thank-you',
+        'chamber-of-secrets',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Contribute to CoS',
+      items: [
+        'setting-up-server',
+        'setting-up-client',
       ],
     },
   ],
