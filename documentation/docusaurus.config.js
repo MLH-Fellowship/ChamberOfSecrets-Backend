@@ -2,7 +2,7 @@
 module.exports = {
   title: 'Chamber of Secrets',
   tagline: 'Digi-locker redifined, inspired by Lord Voldermort.',
-  url: 'https://60703cf841cf3f24e33c8e5e--pedantic-raman-8ffffb.netlify.app',
+  url: 'https://chamber-of-secrets.netlify.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
