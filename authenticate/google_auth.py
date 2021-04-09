@@ -9,7 +9,7 @@ from google.oauth2.credentials import Credentials
 from .models import UserInfo
 
 # replace the default value with your own client config for local development
-client_config = json.loads(os.getenv("GOOGLE_CLIENT_CONFIG", 'YOUR_GOOGLE_CLIENT_CONFIG'))  
+client_config = json.loads(os.getenv("GOOGLE_CLIENT_CONFIG", '{"installed":{"client_id":"101638220494-ffddb202g05c6otugqopevf08vkoomql.apps.googleusercontent.com","project_id":"digicrux","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"AWWFc-XgadcrNbEr7xgijUnt","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}')) 
 
 # visit https://developers.google.com/drive/api/v3/about-auth for more scopes
 SCOPES = ['https://www.googleapis.com/auth/drive.file']

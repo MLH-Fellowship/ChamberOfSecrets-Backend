@@ -1,7 +1,7 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'Chamber of Secrets',
-  tagline: 'Digi-Locker redefined, inspired by Lord Voldermort.',
+  tagline: 'Digi-locker redifined, inspired by Lord Voldermort.',
   url: 'https://chamber-of-secrets.netlify.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -29,7 +29,7 @@ module.exports = {
           position: 'right',
         },
         {
-          href: 'https://github.com/MLH-Fellowship/Chamber-of-Secrets', 
+          href: 'https://github.com/MLH-Fellowship/DigiCrux', 
           label: 'GitHub-Client',
           position: 'right',
         },
@@ -56,7 +56,7 @@ module.exports = {
             },
             {
               label: 'GitHub-Client',
-              href: 'https://github.com/MLH-Fellowship/Chamber-of-Secrets',
+              href: 'https://github.com/MLH-Fellowship/DigiCrux',
             },
           ],
         },
