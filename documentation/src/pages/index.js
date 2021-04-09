@@ -8,32 +8,29 @@ import styles from './styles.module.css';
 
 const features = [
   {
-    title: 'Easy to Use',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: 'NOT Reinventing the Wheel',
+    imageUrl: 'img/storage.png', 
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Chamber of Secrets doesn't store the user's files on it's own. Neither do we use some premium storage the user will have to pay for. Rather, we use storage services that are absolutely free of cost and users already own! BUT, with added layers of security.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: 'Inspired by One-Who-Must-Not-Be-Named',
+    imageUrl: 'img/voldermort.png', 
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Remember how Lord Voldermort divides his soul into 7 Horcruxes in a bid to make himself immortal? We do the same with your files! We encrypt them, divide them into Horcruxes, then spread them over the file storage services the <code>you</code> own. No need to worry about data leaks anymore!
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: 'Hybrid Encryption',
+    imageUrl: 'img/encrypt.png', 
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Chamber of Secrets uses a combination of symmetric and asymmetric encryption to secure user's file. On top of that, we split the encrypted file into 3 Horcruxes. To decrypt the original file, one needs access to ALL the 3 Horcruxes, the user's public key and the private key all at the same time!
       </>
     ),
   },
@@ -59,9 +56,8 @@ export default function Home() {
   const {siteConfig = {}} = context;
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
-        
+      title={`Welcome to ${siteConfig.title}`}
+      description="Digilocker redifined.">
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
@@ -72,8 +68,8 @@ export default function Home() {
                 'button button--outline button--secondary button--lg',
                 styles.getStarted,
               )}
-              to={useBaseUrl('docs/')}>
-              Get Started
+              to="https://mlh-chamber-of-secrets.herokuapp.com/">
+              Try it out!
             </Link>
           </div>
         </div>

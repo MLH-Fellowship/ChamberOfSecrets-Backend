@@ -6,15 +6,15 @@ module.exports = {
   baseUrl: '/ChamberOfSecrets-Backend/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/ChamberOfSecrets.png',
   organizationName: 'MLH-Fellowship', // Usually your GitHub org/user name.
   projectName: 'ChamberOfSecrets', // Usually your repo name.
   themeConfig: {
     navbar: {
       title: 'Chamber of Secrets', 
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        alt: 'Chamber of Secrets',
+        src: 'img/ChamberOfSecrets.png', 
       },
       items: [
         {

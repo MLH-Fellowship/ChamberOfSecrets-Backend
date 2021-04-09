@@ -59,3 +59,11 @@ In order to contribute to the project, make sure you follow the below mentioned 
 
 3. Once the issue is fixed, create a PR to the upstream repository's staging branch. Wait and hear back from the project managers on their response. Once your build is tested and approved, the PR will get merged. If any changes are required, you can continue coordinating with the project managers and work on the requirements.
 
+## Resources:
+---
+
+1. Django REST Framework Documentation: [Click here!](https://www.django-rest-framework.org/)
+
+2. Cryptography Python Module: [Click here!](https://pypi.org/project/cryptography/)
+
+3. Docusaurus Documentation: [Click here!](https://docusaurus.io/)

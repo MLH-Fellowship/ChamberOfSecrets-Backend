@@ -23,8 +23,13 @@ This was the question that ultimately led to the final product— Chamber of Sec
 ### Here's how Chamber of Secrets works:
 
 1. The user signs up for our platform, that is free of cost since the project is open sourced.
+
+![Signup Screen](/img/signup.jpg)
+
 2. Upon signing up, they get a unique Private Key.
 
+![Private Key Screen](/img/private.jpg) 
+ 
 :::warning Take Care
 
 We don't store the private key of the user! It is made available to the user to copy/download just once at the time of account creation. 
@@ -37,7 +42,12 @@ If the key is lost, all the encrypted, uploaded files can NEVER be decrypted aga
 
 3. The user downloads and stored the private key safely.
 4. Next they are taken to the OAuth screen where they need to authenticate into both their **Google Drive** and **Dropbox** accounts. 
+
+![OAuth Screen](/img/oauth.jpg)
+
 5. Once done, they are finally taken to the locker screen. Here's where they can upload their files, download (if any), or delete their files.
+
+![Home Screen](/img/home.jpg) 
 
 #### Seems pretty simple and user-friendly, right? 
 
@@ -46,6 +56,8 @@ Well, the backend is where all the magic happens!
 ### User Uploads a File:
 
 To upload a file, the user clicks on **Upload New File**. User selects a file, enters their private key and hits upload.
+
+![Upload](/img/upload.jpg) 
 
 Now behind the scene, the file gets encrypted, split into 3 "Horcruxes", then these Horcruxes get uploaded on the user's Google Drive and Dropbox. 
 
@@ -64,6 +76,8 @@ If they don't have all these, your files are **virtually un-crackable**! You **c
 ### User Downloads a File:
 
 To download a file, the user has to double-click on the file. Then, once they enter their private key, they hit download button.
+ 
+![Download](/img/download.jpg)
 
 Behind the scenes, the individual, encrypted Horcruxes get downloaded from user's file storage services, get re-combined into an encrypted file, and then get decrypted before getting returned back to the user. 
 
@@ -72,6 +86,8 @@ Sounds pretty cool, right?
 ### User Deletes a File:
 
 For deleting a file, user needs to just select the file by doing a single-click, then hit delete. It's that easy!
+
+![Delete](/img/delete.jpg) 
 
 Behing the scenes, the Horcruxes get wiped from the user's file storage and all the records get deleted from the database. 
 
