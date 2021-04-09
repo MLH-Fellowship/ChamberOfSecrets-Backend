@@ -3,7 +3,7 @@ title: Chamber of Secrets
 ---
 ---
 
-Built on the principles of *Ethical Data*, **Chamber of Secrets** is a redifined Digital Locker system straight out of the magical Hrry Potter universe created J.K. Rowling. Inspired by the *One-Who-Must-Not-Be-Named*, Lord Voldermort himself, we ensure that your data is accessible to you, and **only you**. 
+Built on the principles of *Ethical Data*, **Chamber of Secrets** is a redefined Digital Locker system straight out of the magical Harry Potter universe created by J.K. Rowling. Inspired by the *One-Who-Must-Not-Be-Named*, Lord Voldermort himself, we ensure that your data is accessible to you, and **only you**. 
 
 :::note
 

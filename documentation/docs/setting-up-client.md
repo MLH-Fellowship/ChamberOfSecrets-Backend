@@ -3,7 +3,7 @@ title: Contribution Guide- Client
 ---
 ---
 
-In this guide, we will have a look at how you can get started with contributing to the Chamber of Secrets client-side web application. The client-side application for CoS has been built using **React**, and communicates to the backend server using **Axios**.
+In this guide, we will have a look at how you can get started with contributing to the Chamber of Secrets client-side web application. The client-side application for CoS has been built using **React**, and communicates to the backend server using **Axios** and **Fetch API**.
 
 ## Setting Up Local Environment
 ---
@@ -46,6 +46,7 @@ In order to contribute to the project, make sure you follow the below mentioned 
 ---
 
 React Documentation: [Click here!](https://reactjs.org/)
+Axios Documentation: [Click here!](https://axios-http.com/)
 
 
 
