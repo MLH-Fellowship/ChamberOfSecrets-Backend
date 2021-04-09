@@ -2,8 +2,8 @@
 module.exports = {
   title: 'Chamber of Secrets',
   tagline: 'Digi-locker redifined, inspired by Lord Voldermort.',
-  url: 'https://github.com/MLH-Fellowship.github.io',
-  baseUrl: '/ChamberOfSecrets-Backend/',
+  url: 'https://60703cf841cf3f24e33c8e5e--pedantic-raman-8ffffb.netlify.app',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/ChamberOfSecrets.png',
