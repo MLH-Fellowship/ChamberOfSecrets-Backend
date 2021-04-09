@@ -16,6 +16,10 @@ google-auth-oauthlib = "*"
 djangorestframework-simplejwt = "*"
 pyjwt = "==1.7.1"
 dropbox = "*"
+gunicorn = "*"
+dj-database-url = "*"
+psycopg2 = "*"
+whitenoise = "*"
 
 [dev-packages]
 
