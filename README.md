@@ -1,3 +1,5 @@
+<img src="https://github.com/MLH-Fellowship/ChamberOfSecrets-Backend/blob/main/documentation/static/img/ChamberOfSecrets.png" width="150px" height="150px">
+
 # Chamber Of Secrets Backend
 ---
 
