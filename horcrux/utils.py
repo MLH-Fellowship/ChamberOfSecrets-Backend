@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from authenticate.google_auth import generate_google_token_from_db
-from authenticate.dropbox_auth import generate_dropbox_token_from_db, dropbox_app_key  
+from authenticate.dropbox_auth import generate_dropbox_token_from_db, dropbox_app_key, dropbox_app_secret   
 
 import dropbox 
 from googleapiclient.discovery import build
@@ -39,6 +39,9 @@ def get_drive_services(username):
     # building google drive service
     g_service = build('drive', 'v3', credentials=g_creds)
     # building dropbox service 
-    d_service = dropbox.Dropbox(app_key=dropbox_app_key, **d_creds)
+    d_service = dropbox.Dropbox(app_key=dropbox_app_key, 
+                                oauth2_access_token=d_creds['oauth2_access_token'],
+                                oauth2_refresh_token=d_creds['oauth2_refresh_token'], 
+                                app_secret=dropbox_app_secret)  
     d_service.check_and_refresh_access_token()
     return g_service, d_service
