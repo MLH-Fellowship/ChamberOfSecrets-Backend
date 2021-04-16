@@ -25,17 +25,25 @@ pip install pipenv
 pipenv install && pipenv shell
 ```
 
-3. Running the database migrations:
+3. Set up your environment variables:
+- Go to backend/settings.py and replace the default value of `APP_SECRET_KEY` to your app secret key. This will be used to hash the passwords at the time of authentication.
+
+- Create a new app on [Dropbox Developers App Console](https://www.dropbox.com/lp/developers). Next, go to authenticate/dropbox_auth.py and replace `DROPBOX_APP_KEY` and `DROPBOX_APP_SECRET` with your app key and app secret respectively.
+
+- Create a new project on [Google Cloud Console](https://console.cloud.google.com). Go to APIs and Services and enable the Google Drive API for your project. Next, in the code go to authenticate/google_auth.py and replace `GOOGLE_CLIENT_CONFIG` with the google client configurations of your Google Cloud Project. Make sure at the time of oauth config generation, select application type as desktop.
+
+
+4. Running the database migrations:
 ```bash
 python manage.py migrate
 ```
 
-4. Creating superuser for Django Admin:
+5. Creating superuser for Django Admin:
 ```bash
 python manage.py runserver
 ```
 
-5. Running the server locally. 
+6. Running the server locally. 
 ```bash
 python manage.py runserver
 ```
